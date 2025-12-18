@@ -52,6 +52,7 @@ RUN apk add --no-cache \
     postgresql-dev \
     nginx \
     supervisor \
+    gettext \
     && docker-php-ext-install \
     pdo_mysql \
     pdo_pgsql \
@@ -85,6 +86,8 @@ RUN chown -R www-data:www-data /var/www/html \
 
 # Copy Nginx configuration
 COPY docker/nginx.conf /etc/nginx/nginx.conf
+COPY docker/default.conf.template /etc/nginx/http.d/default.conf.template
+# Create initial default.conf (will be replaced by entrypoint script)
 COPY docker/default.conf /etc/nginx/http.d/default.conf
 
 # Copy Supervisor configuration
@@ -97,9 +100,9 @@ RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 # Expose port
 EXPOSE 80
 
-# Health check
+# Health check (PORT will be set at runtime)
 HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
-    CMD wget --no-verbose --tries=1 --spider http://localhost/ 2>/dev/null || exit 1
+    CMD wget --no-verbose --tries=1 --spider http://localhost:${PORT:-80}/ 2>/dev/null || exit 1
 
 # Use entrypoint script
 ENTRYPOINT ["docker-entrypoint.sh"]

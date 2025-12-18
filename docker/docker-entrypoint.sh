@@ -3,6 +3,28 @@ set -e
 
 echo "Starting Vietlance application..."
 
+# Set PORT from Railway environment variable (default to 80)
+export PORT=${PORT:-80}
+echo "Using PORT: $PORT"
+
+# Generate Nginx config with PORT variable from template
+if [ -f /etc/nginx/http.d/default.conf.template ]; then
+    # Use envsubst if available, otherwise use sed
+    if command -v envsubst >/dev/null 2>&1; then
+        envsubst '${PORT}' < /etc/nginx/http.d/default.conf.template > /etc/nginx/http.d/default.conf
+        echo "Nginx config generated with PORT=$PORT (using envsubst)"
+    else
+        # Fallback: use sed to replace ${PORT} with actual PORT value
+        sed "s/\${PORT}/${PORT}/g" /etc/nginx/http.d/default.conf.template > /etc/nginx/http.d/default.conf
+        echo "Nginx config generated with PORT=$PORT (using sed)"
+    fi
+else
+    # Fallback: modify existing config if template not found
+    sed -i "s/listen 80/listen ${PORT}/g" /etc/nginx/http.d/default.conf 2>/dev/null || true
+    sed -i "s/listen \[::\]:80/listen [::]:${PORT}/g" /etc/nginx/http.d/default.conf 2>/dev/null || true
+    echo "Nginx config updated with PORT=$PORT"
+fi
+
 # Wait for MySQL to be ready
 echo "Waiting for MySQL..."
 until php -r "try { new PDO('mysql:host=${DB_HOST:-mysql};port=${DB_PORT:-3306}', '${DB_USERNAME:-root}', '${DB_PASSWORD:-password}'); echo 'MySQL is ready\n'; exit(0); } catch (Exception \$e) { exit(1); }" 2>/dev/null; do
