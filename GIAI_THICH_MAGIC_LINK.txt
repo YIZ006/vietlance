@@ -1,0 +1,226 @@
+================================================================================
+                    GIẢI THÍCH VỀ BẢNG MAGIC_LINKS
+================================================================================
+
+📧 MAGIC LINK LÀ GÌ?
+--------------------
+Magic Link (Link ma thuật) là một phương thức đăng nhập KHÔNG CẦN MẬT KHẨU.
+Thay vì nhập mật khẩu, người dùng chỉ cần nhập email và nhận một link đặc biệt
+qua email để đăng nhập.
+
+================================================================================
+🎯 TÁC DỤNG CỦA BẢNG MAGIC_LINKS
+================================================================================
+
+1. ĐĂNG NHẬP NHANH KHÔNG CẦN MẬT KHẨU
+   - Người dùng (talent hoặc client) chỉ cần nhập email
+   - Hệ thống gửi một link đặc biệt đến email
+   - Click vào link → Tự động đăng nhập
+   - Không cần nhớ mật khẩu!
+
+2. BẢO MẬT CAO
+   - Mỗi link chỉ có thể sử dụng 1 lần
+   - Link có thời gian hết hạn (15 phút)
+   - Token được mã hóa bằng Hash
+   - Chỉ người có quyền truy cập email mới có thể đăng nhập
+
+3. TRẢI NGHIỆM NGƯỜI DÙNG TỐT HƠN
+   - Không cần nhớ mật khẩu phức tạp
+   - Đăng nhập nhanh chỉ với 1 click
+   - Giảm tỷ lệ quên mật khẩu
+
+================================================================================
+📋 CẤU TRÚC BẢNG MAGIC_LINKS
+================================================================================
+
+Cột                | Mô tả
+-------------------|----------------------------------------------------------
+id                 | ID tự động tăng
+email              | Email của người dùng muốn đăng nhập
+token              | Token duy nhất (64 ký tự, đã mã hóa bằng Hash)
+user_type          | Loại người dùng: 'talent' hoặc 'client'
+expires_at         | Thời gian hết hạn (thường là 15 phút sau khi tạo)
+used               | Đã sử dụng chưa (true/false) - chỉ dùng 1 lần
+created_at         | Thời gian tạo
+updated_at         | Thời gian cập nhật
+
+================================================================================
+🔄 QUY TRÌNH HOẠT ĐỘNG
+================================================================================
+
+BƯỚC 1: NGƯỜI DÙNG YÊU CẦU MAGIC LINK
+   - Vào trang đăng nhập
+   - Click "Đăng nhập nhanh bằng email" hoặc "Magic Link"
+   - Nhập email của mình
+   - Click "Gửi link"
+
+BƯỚC 2: HỆ THỐNG TẠO VÀ LƯU TOKEN
+   - Kiểm tra email có tồn tại trong hệ thống không
+   - Tạo token ngẫu nhiên (64 ký tự)
+   - Mã hóa token bằng Hash
+   - Lưu vào bảng magic_links:
+     * email: email người dùng
+     * token: token đã mã hóa
+     * user_type: 'talent' hoặc 'client'
+     * expires_at: thời gian hiện tại + 15 phút
+     * used: false
+
+BƯỚC 3: GỬI EMAIL CHỨA LINK
+   - Tạo link đăng nhập: /talent/login/magic/{token}
+   - Gửi email chứa link này đến người dùng
+   - Email có nội dung: "Click vào link để đăng nhập"
+
+BƯỚC 4: NGƯỜI DÙNG CLICK LINK
+   - Người dùng mở email và click vào link
+   - Link sẽ dẫn đến: /talent/login/magic/{token}
+
+BƯỚC 5: HỆ THỐNG XÁC THỰC VÀ ĐĂNG NHẬP
+   - Hệ thống nhận token từ URL
+   - Tìm trong bảng magic_links:
+     * Token khớp (sau khi hash)
+     * expires_at > thời gian hiện tại (chưa hết hạn)
+     * used = false (chưa sử dụng)
+   - Nếu hợp lệ:
+     * Tự động đăng nhập người dùng
+     * Đánh dấu used = true (không thể dùng lại)
+     * Xóa hoặc giữ lại record (tùy thiết kế)
+   - Nếu không hợp lệ:
+     * Hiển thị lỗi: "Link không hợp lệ hoặc đã hết hạn"
+
+================================================================================
+💡 VÍ DỤ CỤ THỂ
+================================================================================
+
+TÌNH HUỐNG: Talent muốn đăng nhập nhanh
+
+1. Talent vào trang: /talent/login
+2. Click "Đăng nhập nhanh bằng email"
+3. Nhập email: talent1@vietlance.com
+4. Click "Gửi link"
+
+→ Hệ thống tạo record trong magic_links:
+   - email: talent1@vietlance.com
+   - token: $2y$12$abc123...xyz789 (đã hash)
+   - user_type: talent
+   - expires_at: 2025-12-11 10:15:00 (15 phút sau)
+   - used: false
+
+→ Gửi email đến talent1@vietlance.com với link:
+   https://vietlance.com/talent/login/magic/abc123xyz789
+
+5. Talent mở email và click link
+
+→ Hệ thống kiểm tra:
+   - Token "abc123xyz789" → hash → so sánh với token trong DB
+   - expires_at > now() → OK
+   - used = false → OK
+
+→ Đăng nhập thành công!
+→ Cập nhật: used = true
+
+6. Nếu talent click lại link đó lần nữa
+→ Hệ thống kiểm tra: used = true → Từ chối
+→ Hiển thị: "Link đã được sử dụng"
+
+================================================================================
+🔒 BẢO MẬT
+================================================================================
+
+1. TOKEN ĐƯỢC MÃ HÓA
+   - Token trong database được hash bằng bcrypt
+   - Token trong URL là token gốc (chưa hash)
+   - Khi xác thực, hash token từ URL rồi so sánh với DB
+
+2. THỜI GIAN HẾT HẠN
+   - Mỗi link chỉ có hiệu lực 15 phút
+   - Sau 15 phút, link tự động vô hiệu
+   - Người dùng phải yêu cầu link mới
+
+3. CHỈ DÙNG 1 LẦN
+   - Sau khi đăng nhập thành công, used = true
+   - Link không thể dùng lại
+   - Ngăn chặn việc chia sẻ link
+
+4. KIỂM TRA EMAIL TỒN TẠI
+   - Chỉ email đã đăng ký mới nhận được link
+   - Ngăn chặn spam và tấn công
+
+================================================================================
+📊 SO SÁNH VỚI ĐĂNG NHẬP THÔNG THƯỜNG
+================================================================================
+
+ĐĂNG NHẬP THÔNG THƯỜNG          | MAGIC LINK
+--------------------------------|------------------------------------------
+Nhập email + mật khẩu          | Chỉ nhập email
+Cần nhớ mật khẩu                | Không cần nhớ mật khẩu
+Có thể đăng nhập nhiều lần      | Link chỉ dùng 1 lần
+Mật khẩu có thể bị lộ           | Token tự động hết hạn
+Cần reset mật khẩu nếu quên     | Chỉ cần yêu cầu link mới
+
+================================================================================
+🎯 KHI NÀO SỬ DỤNG MAGIC LINK?
+================================================================================
+
+✅ PHÙ HỢP:
+- Người dùng muốn đăng nhập nhanh
+- Quên mật khẩu nhưng vẫn có quyền truy cập email
+- Muốn trải nghiệm đăng nhập đơn giản
+- Thiết bị công cộng (không muốn nhập mật khẩu)
+
+❌ KHÔNG PHÙ HỢP:
+- Email không an toàn
+- Cần bảo mật cao (nên dùng 2FA)
+- Không có quyền truy cập email ngay lập tức
+
+================================================================================
+📝 CODE LIÊN QUAN
+================================================================================
+
+1. Controller: TalentLoginController.php
+   - sendMagicLink(): Gửi magic link
+   - loginWithMagicLink(): Xác thực và đăng nhập
+
+2. Model: MagicLink.php
+   - isValid(): Kiểm tra token còn hợp lệ không
+   - markAsUsed(): Đánh dấu đã sử dụng
+
+3. Mail: MagicLinkMail.php
+   - Gửi email chứa link đăng nhập
+
+4. Routes:
+   - POST /talent/login/magic-link → Gửi link
+   - GET /talent/login/magic/{token} → Đăng nhập bằng link
+
+================================================================================
+🔗 LIÊN KẾT VỚI CÁC BẢNG KHÁC
+================================================================================
+
+Bảng magic_links KHÔNG có foreign key trực tiếp, nhưng:
+- email: Tham chiếu đến email trong bảng 'talent' hoặc 'client'
+- user_type: Xác định loại người dùng ('talent' hoặc 'client')
+
+Khi xác thực thành công:
+- Tìm user trong bảng 'talent' hoặc 'client' dựa vào email
+- Đăng nhập user đó vào hệ thống
+
+================================================================================
+📌 TÓM TẮT
+================================================================================
+
+Bảng magic_links dùng để:
+✅ Đăng nhập không cần mật khẩu
+✅ Gửi link đăng nhập qua email
+✅ Bảo mật bằng token có thời hạn
+✅ Chỉ dùng 1 lần
+✅ Hỗ trợ cả talent và client
+
+Lợi ích:
+- Trải nghiệm người dùng tốt hơn
+- Giảm tỷ lệ quên mật khẩu
+- Đăng nhập nhanh chóng
+- Bảo mật tốt với token có thời hạn
+
+================================================================================
+Ngày tạo: 2025-12-11
+================================================================================
+

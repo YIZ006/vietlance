@@ -1,0 +1,422 @@
+================================================================================
+                    CẤU TRÚC TẤT CẢ CÁC BẢNG TRONG DATABASE
+                            Database: vietlance
+================================================================================
+
+1. BẢNG: admin
+   Mô tả: Bảng quản trị viên hệ thống
+   ----------------------------------------------------------------------------
+   Cột                    | Kiểu dữ liệu              | Mô tả
+   -----------------------|---------------------------|------------------------
+   id                     | BIGINT UNSIGNED (PK)     | ID tự động tăng
+   name                   | VARCHAR(255)              | Tên admin
+   email                  | VARCHAR(255) UNIQUE      | Email (duy nhất)
+   email_verified_at      | TIMESTAMP NULL            | Thời gian xác minh email
+   password               | VARCHAR(255)              | Mật khẩu (đã mã hóa)
+   admin_login            | VARCHAR(255) UNIQUE NULL  | Tên đăng nhập admin
+   phone                  | VARCHAR(255) NULL         | Số điện thoại
+   address                | TEXT NULL                 | Địa chỉ
+   avatar                 | VARCHAR(255) NULL         | Đường dẫn ảnh đại diện
+   role                   | ENUM('superadmin',        | Vai trò: superadmin,
+                          |       'admin', 'viewer')  | admin, hoặc viewer
+   status                 | ENUM('active',            | Trạng thái: active,
+                          |       'inactive',         | inactive, hoặc locked
+                          |       'locked')
+   remember_token         | VARCHAR(100) NULL         | Token nhớ đăng nhập
+   created_at             | TIMESTAMP NULL            | Thời gian tạo
+   updated_at             | TIMESTAMP NULL            | Thời gian cập nhật
+   ----------------------------------------------------------------------------
+   Indexes:
+   - PRIMARY KEY (id)
+   - UNIQUE (email)
+   - UNIQUE (admin_login)
+   ----------------------------------------------------------------------------
+
+
+2. BẢNG: talent
+   Mô tả: Bảng tài năng/freelancer (đã đổi tên từ freelance)
+   ----------------------------------------------------------------------------
+   Cột                    | Kiểu dữ liệu              | Mô tả
+   -----------------------|---------------------------|------------------------
+   id                     | BIGINT UNSIGNED (PK)     | ID tự động tăng
+   name                   | VARCHAR(255)              | Tên talent
+   email                  | VARCHAR(255) UNIQUE      | Email (duy nhất)
+   email_verified_at       | TIMESTAMP NULL            | Thời gian xác minh email
+   password               | VARCHAR(255)             | Mật khẩu (đã mã hóa)
+   github_id              | VARCHAR(255) UNIQUE NULL | ID GitHub (duy nhất)
+   github_token           | TEXT NULL                 | Token GitHub
+   github_refresh_token   | TEXT NULL                 | Refresh token GitHub
+   phone                  | VARCHAR(255) NULL         | Số điện thoại
+   address                | TEXT NULL                 | Địa chỉ
+   avatar                 | VARCHAR(255) NULL         | Đường dẫn ảnh đại diện
+   bio                    | TEXT NULL                 | Tiểu sử
+   skills                 | VARCHAR(255) NULL         | Kỹ năng
+   hourly_rate            | DECIMAL(10,2) NULL        | Giá/giờ
+   experience_years       | INTEGER NULL              | Số năm kinh nghiệm
+   is_active              | BOOLEAN DEFAULT true      | Trạng thái hoạt động
+   remember_token         | VARCHAR(100) NULL         | Token nhớ đăng nhập
+   created_at             | TIMESTAMP NULL            | Thời gian tạo
+   updated_at             | TIMESTAMP NULL            | Thời gian cập nhật
+   ----------------------------------------------------------------------------
+   Indexes:
+   - PRIMARY KEY (id)
+   - UNIQUE (email)
+   - UNIQUE (github_id)
+   ----------------------------------------------------------------------------
+
+
+3. BẢNG: client
+   Mô tả: Bảng khách hàng
+   ----------------------------------------------------------------------------
+   Cột                    | Kiểu dữ liệu              | Mô tả
+   -----------------------|---------------------------|------------------------
+   id                     | BIGINT UNSIGNED (PK)      | ID tự động tăng
+   name                   | VARCHAR(255)              | Tên khách hàng
+   email                  | VARCHAR(255) UNIQUE       | Email (duy nhất)
+   email_verified_at       | TIMESTAMP NULL           | Thời gian xác minh email
+   password               | VARCHAR(255)              | Mật khẩu (đã mã hóa)
+   phone                  | VARCHAR(255) NULL         | Số điện thoại
+   address                | TEXT NULL                 | Địa chỉ
+   avatar                 | VARCHAR(255) NULL         | Đường dẫn ảnh đại diện
+   company_name           | VARCHAR(255) NULL         | Tên công ty
+   company_description    | TEXT NULL                 | Mô tả công ty
+   is_active              | BOOLEAN DEFAULT true      | Trạng thái hoạt động
+   remember_token         | VARCHAR(100) NULL         | Token nhớ đăng nhập
+   created_at             | TIMESTAMP NULL            | Thời gian tạo
+   updated_at             | TIMESTAMP NULL            | Thời gian cập nhật
+   ----------------------------------------------------------------------------
+   Indexes:
+   - PRIMARY KEY (id)
+   - UNIQUE (email)
+   ----------------------------------------------------------------------------
+
+
+4. BẢNG: profiles
+   Mô tả: Bảng profile chi tiết của talent (giống Upwork)
+   ----------------------------------------------------------------------------
+   Cột                    | Kiểu dữ liệu              | Mô tả
+   -----------------------|---------------------------|------------------------
+   id                     | BIGINT UNSIGNED (PK)     | ID tự động tăng
+   talent_id              | BIGINT UNSIGNED UNIQUE   | ID talent (FK)
+   profile_overview       | TEXT NULL                 | Mô tả tổng quan profile
+   experience_level       | ENUM('entry',             | Mức độ kinh nghiệm:
+                          |       'intermediate',     | entry, intermediate,
+                          |       'expert') NULL      | hoặc expert
+   hours_per_week         | VARCHAR(255) NULL         | Số giờ làm việc/tuần
+   open_to_contract_to_hire| BOOLEAN DEFAULT false    | Sẵn sàng hợp đồng thuê
+   visibility             | ENUM('public',            | Hiển thị: public hoặc
+                          |       'private')          | private (default: public)
+                          |       DEFAULT 'public'
+   project_preference     | VARCHAR(255) NULL         | Ưu tiên dự án
+   earnings_privacy       | BOOLEAN DEFAULT false     | Riêng tư thu nhập
+   video_introduction_url | VARCHAR(500) NULL         | Link video giới thiệu
+   languages              | JSON NULL                 | Danh sách ngôn ngữ
+                          |                           | [{"language":"English",
+                          |                           |  "level":"Fluent"},...]
+   id_verified            | BOOLEAN DEFAULT false     | Đã xác minh ID
+   military_veteran       | BOOLEAN DEFAULT false     | Cựu quân nhân
+   work_history           | JSON NULL                 | Lịch sử công việc
+   skills                 | JSON NULL                 | Danh sách kỹ năng
+                          |                           | ["Translation",...]
+   primary_category       | VARCHAR(255) NULL         | Danh mục chính
+   sub_categories         | JSON NULL                 | Danh mục phụ
+   specialized_profiles   | JSON NULL                 | Profile chuyên biệt
+   published_profiles_count| INTEGER DEFAULT 0        | Số profile đã publish
+   github_username        | VARCHAR(255) NULL         | Username GitHub
+   stackoverflow_username | VARCHAR(255) NULL         | Username StackOverflow
+   linkedin_url           | VARCHAR(500) NULL         | Link LinkedIn
+   portfolio_url          | VARCHAR(500) NULL         | Link portfolio
+   certifications         | JSON NULL                 | Danh sách chứng chỉ
+   employment_history     | JSON NULL                 | Lịch sử làm việc
+   other_experiences      | JSON NULL                 | Kinh nghiệm khác
+   education              | JSON NULL                 | Học vấn
+   licenses               | JSON NULL                 | Giấy phép
+   project_catalog        | JSON NULL                 | Danh mục dự án
+   testimonials           | JSON NULL                 | Lời chứng thực
+   ai_data_training_opt_in| BOOLEAN DEFAULT false     | Đồng ý dùng dữ liệu cho AI
+   created_at             | TIMESTAMP NULL            | Thời gian tạo
+   updated_at             | TIMESTAMP NULL            | Thời gian cập nhật
+   ----------------------------------------------------------------------------
+   Indexes:
+   - PRIMARY KEY (id)
+   - UNIQUE (talent_id)
+   - FOREIGN KEY (talent_id) REFERENCES talent(id) ON DELETE CASCADE
+   ----------------------------------------------------------------------------
+
+
+5. BẢNG: magic_links
+   Mô tả: Bảng link đăng nhập nhanh (magic link)
+   ----------------------------------------------------------------------------
+   Cột                    | Kiểu dữ liệu              | Mô tả
+   -----------------------|---------------------------|------------------------
+   id                     | BIGINT UNSIGNED (PK)     | ID tự động tăng
+   email                  | VARCHAR(255)              | Email người dùng
+   token                  | VARCHAR(64) UNIQUE        | Token đăng nhập (duy nhất)
+   user_type              | ENUM('talent', 'client')  | Loại người dùng
+   expires_at             | TIMESTAMP                 | Thời gian hết hạn
+   used                   | BOOLEAN DEFAULT false     | Đã sử dụng chưa
+   created_at             | TIMESTAMP NULL            | Thời gian tạo
+   updated_at             | TIMESTAMP NULL            | Thời gian cập nhật
+   ----------------------------------------------------------------------------
+   Indexes:
+   - PRIMARY KEY (id)
+   - UNIQUE (token)
+   - INDEX (email, user_type)
+   - INDEX (token)
+   ----------------------------------------------------------------------------
+
+
+6. BẢNG: job_categories
+   Mô tả: Bảng danh mục công việc
+   ----------------------------------------------------------------------------
+   Cột                    | Kiểu dữ liệu              | Mô tả
+   -----------------------|---------------------------|------------------------
+   category_id            | BIGINT UNSIGNED (PK)     | ID danh mục
+   category_name          | VARCHAR(200)              | Tên danh mục
+   created_at             | TIMESTAMP NULL            | Thời gian tạo
+   updated_at             | TIMESTAMP NULL            | Thời gian cập nhật
+   ----------------------------------------------------------------------------
+   Indexes:
+   - PRIMARY KEY (category_id)
+   ----------------------------------------------------------------------------
+
+
+7. BẢNG: it_jobs
+   Mô tả: Bảng công việc IT
+   ----------------------------------------------------------------------------
+   Cột                    | Kiểu dữ liệu              | Mô tả
+   -----------------------|---------------------------|------------------------
+   job_id                 | BIGINT UNSIGNED (PK)     | ID công việc
+   job_title              | VARCHAR(255)              | Tên công việc
+   category_id            | BIGINT UNSIGNED NULL      | ID danh mục (FK)
+   short_description      | TEXT NULL                 | Mô tả ngắn
+   created_at             | TIMESTAMP NULL            | Thời gian tạo
+   updated_at             | TIMESTAMP NULL            | Thời gian cập nhật
+   ----------------------------------------------------------------------------
+   Indexes:
+   - PRIMARY KEY (job_id)
+   - FOREIGN KEY (category_id) REFERENCES job_categories(category_id)
+     ON DELETE SET NULL
+   ----------------------------------------------------------------------------
+
+
+8. BẢNG: programming_languages
+   Mô tả: Bảng ngôn ngữ lập trình
+   ----------------------------------------------------------------------------
+   Cột                    | Kiểu dữ liệu              | Mô tả
+   -----------------------|---------------------------|------------------------
+   id                     | BIGINT UNSIGNED (PK)     | ID tự động tăng
+   name                   | VARCHAR(100) UNIQUE       | Tên ngôn ngữ (duy nhất)
+   category               | VARCHAR(100)              | Danh mục ngôn ngữ
+   description            | TEXT NULL                 | Mô tả
+   created_at             | TIMESTAMP NULL            | Thời gian tạo
+   updated_at             | TIMESTAMP NULL            | Thời gian cập nhật
+   ----------------------------------------------------------------------------
+   Indexes:
+   - PRIMARY KEY (id)
+   - UNIQUE (name)
+   ----------------------------------------------------------------------------
+
+
+9. BẢNG: users (Laravel Default)
+   Mô tả: Bảng người dùng mặc định của Laravel (có thể không sử dụng)
+   ----------------------------------------------------------------------------
+   Cột                    | Kiểu dữ liệu              | Mô tả
+   -----------------------|---------------------------|------------------------
+   id                     | BIGINT UNSIGNED (PK)     | ID tự động tăng
+   name                   | VARCHAR(255)              | Tên người dùng
+   email                  | VARCHAR(255) UNIQUE      | Email (duy nhất)
+   email_verified_at      | TIMESTAMP NULL            | Thời gian xác minh email
+   password               | VARCHAR(255)              | Mật khẩu (đã mã hóa)
+   remember_token         | VARCHAR(100) NULL         | Token nhớ đăng nhập
+   created_at             | TIMESTAMP NULL            | Thời gian tạo
+   updated_at             | TIMESTAMP NULL            | Thời gian cập nhật
+   ----------------------------------------------------------------------------
+
+
+10. BẢNG: password_reset_tokens (Laravel Default)
+    Mô tả: Bảng token đặt lại mật khẩu
+    ----------------------------------------------------------------------------
+    Cột                    | Kiểu dữ liệu              | Mô tả
+    -----------------------|---------------------------|------------------------
+    email                  | VARCHAR(255) (PK)        | Email
+    token                  | VARCHAR(255)              | Token đặt lại mật khẩu
+    created_at             | TIMESTAMP NULL            | Thời gian tạo
+    ----------------------------------------------------------------------------
+
+
+11. BẢNG: sessions (Laravel Default)
+    Mô tả: Bảng session của Laravel
+    ----------------------------------------------------------------------------
+    Cột                    | Kiểu dữ liệu              | Mô tả
+    -----------------------|---------------------------|------------------------
+    id                     | VARCHAR(255) (PK)        | ID session
+    user_id                | BIGINT UNSIGNED NULL      | ID người dùng
+    ip_address             | VARCHAR(45) NULL          | Địa chỉ IP
+    user_agent             | TEXT NULL                 | User agent
+    payload                | LONGTEXT                  | Dữ liệu session
+    last_activity          | INTEGER                   | Thời gian hoạt động cuối
+    ----------------------------------------------------------------------------
+
+
+12. BẢNG: cache (Laravel Default)
+    Mô tả: Bảng cache của Laravel
+    ----------------------------------------------------------------------------
+    Cột                    | Kiểu dữ liệu              | Mô tả
+    -----------------------|---------------------------|------------------------
+    key                    | VARCHAR(255) (PK)        | Key cache
+    value                  | MEDIUMTEXT               | Giá trị cache
+    expiration             | INTEGER                   | Thời gian hết hạn
+    ----------------------------------------------------------------------------
+
+
+13. BẢNG: cache_locks (Laravel Default)
+    Mô tả: Bảng cache locks của Laravel
+    ----------------------------------------------------------------------------
+    Cột                    | Kiểu dữ liệu              | Mô tả
+    -----------------------|---------------------------|------------------------
+    key                    | VARCHAR(255) (PK)        | Key lock
+    owner                  | VARCHAR(255)              | Chủ sở hữu lock
+    expiration             | INTEGER                   | Thời gian hết hạn
+    ----------------------------------------------------------------------------
+
+
+14. BẢNG: jobs (Laravel Queue)
+    Mô tả: Bảng jobs queue của Laravel
+    ----------------------------------------------------------------------------
+    Cột                    | Kiểu dữ liệu              | Mô tả
+    -----------------------|---------------------------|------------------------
+    id                     | BIGINT UNSIGNED (PK)     | ID tự động tăng
+    queue                  | VARCHAR(255)              | Tên queue
+    payload                | LONGTEXT                  | Dữ liệu job
+    attempts               | TINYINT UNSIGNED          | Số lần thử
+    reserved_at            | INTEGER UNSIGNED NULL     | Thời gian reserve
+    available_at            | INTEGER UNSIGNED          | Thời gian có sẵn
+    created_at             | INTEGER UNSIGNED          | Thời gian tạo
+    ----------------------------------------------------------------------------
+
+
+15. BẢNG: job_batches (Laravel Queue)
+    Mô tả: Bảng job batches của Laravel
+    ----------------------------------------------------------------------------
+    Cột                    | Kiểu dữ liệu              | Mô tả
+    -----------------------|---------------------------|------------------------
+    id                     | VARCHAR(255) (PK)        | ID batch
+    name                   | VARCHAR(255)              | Tên batch
+    total_jobs             | INTEGER                   | Tổng số jobs
+    pending_jobs           | INTEGER                   | Số jobs đang chờ
+    failed_jobs            | INTEGER                   | Số jobs thất bại
+    failed_job_ids         | LONGTEXT                  | Danh sách ID jobs thất bại
+    options                | MEDIUMTEXT NULL           | Tùy chọn
+    cancelled_at           | INTEGER NULL               | Thời gian hủy
+    created_at             | INTEGER                   | Thời gian tạo
+    finished_at            | INTEGER NULL               | Thời gian hoàn thành
+    ----------------------------------------------------------------------------
+
+
+16. BẢNG: failed_jobs (Laravel Queue)
+    Mô tả: Bảng jobs thất bại của Laravel
+    ----------------------------------------------------------------------------
+    Cột                    | Kiểu dữ liệu              | Mô tả
+    -----------------------|---------------------------|------------------------
+    id                     | BIGINT UNSIGNED (PK)     | ID tự động tăng
+    uuid                   | VARCHAR(255) UNIQUE      | UUID (duy nhất)
+    connection             | TEXT                      | Connection
+    queue                  | TEXT                      | Tên queue
+    payload                | LONGTEXT                  | Dữ liệu job
+    exception              | LONGTEXT                  | Exception
+    failed_at              | TIMESTAMP DEFAULT CURRENT_TIMESTAMP | Thời gian thất bại
+    ----------------------------------------------------------------------------
+
+
+================================================================================
+                            TÓM TẮT QUAN HỆ GIỮA CÁC BẢNG
+================================================================================
+
+1. admin
+   - Không có foreign key
+
+2. talent
+   - Không có foreign key
+   - Liên kết 1-1 với profiles (qua talent_id)
+
+3. client
+   - Không có foreign key
+
+4. profiles
+   - FOREIGN KEY (talent_id) → talent(id) ON DELETE CASCADE
+   - Mỗi talent chỉ có 1 profile
+
+5. magic_links
+   - Không có foreign key
+   - user_type tham chiếu đến 'talent' hoặc 'client'
+
+6. job_categories
+   - Không có foreign key
+   - Liên kết 1-nhiều với it_jobs (qua category_id)
+
+7. it_jobs
+   - FOREIGN KEY (category_id) → job_categories(category_id) ON DELETE SET NULL
+
+8. programming_languages
+   - Không có foreign key
+
+================================================================================
+                            GHI CHÚ QUAN TRỌNG
+================================================================================
+
+1. Bảng 'freelance' đã được đổi tên thành 'talent' (migration rename)
+
+2. Bảng 'admin' có các cột đặc biệt:
+   - admin_login: Tên đăng nhập riêng (khác email)
+   - role: Vai trò (superadmin, admin, viewer)
+   - status: Trạng thái (active, inactive, locked)
+
+3. Bảng 'profiles' sử dụng JSON để lưu trữ:
+   - languages: Danh sách ngôn ngữ và trình độ
+   - skills: Danh sách kỹ năng
+   - certifications: Danh sách chứng chỉ
+   - employment_history: Lịch sử làm việc
+   - education: Học vấn
+   - testimonials: Lời chứng thực
+   - Và nhiều trường JSON khác
+
+4. Bảng 'magic_links' dùng cho đăng nhập nhanh:
+   - user_type: 'talent' hoặc 'client'
+   - token: Token duy nhất để đăng nhập
+   - expires_at: Thời gian hết hạn (thường 15 phút)
+
+5. Các bảng Laravel mặc định (users, sessions, cache, jobs) có thể không được
+   sử dụng trong hệ thống này vì đã có các bảng riêng (admin, talent, client).
+
+================================================================================
+                            TỔNG KẾT
+================================================================================
+
+Tổng số bảng chính trong hệ thống: 8 bảng
+- admin
+- talent
+- client
+- profiles
+- magic_links
+- job_categories
+- it_jobs
+- programming_languages
+
+Các bảng Laravel mặc định: 8 bảng
+- users
+- password_reset_tokens
+- sessions
+- cache
+- cache_locks
+- jobs
+- job_batches
+- failed_jobs
+
+Tổng cộng: 16 bảng
+
+================================================================================
+Ngày tạo: 2025-12-11
+Phiên bản: 1.0
+================================================================================
+

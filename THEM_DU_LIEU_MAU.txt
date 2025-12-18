@@ -1,0 +1,80 @@
+==========================================
+HƯỚNG DẪN THÊM DỮ LIỆU MẪU
+==========================================
+
+CÁCH 1: Chạy Seeder qua Artisan (Khuyến nghị)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. Mở terminal/PowerShell trong thư mục project
+2. Chạy lệnh:
+   php artisan db:seed
+
+Hoặc double-click file: run_seeder.bat
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+CÁCH 2: Chạy SQL trực tiếp trong phpMyAdmin
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. Mở phpMyAdmin: http://localhost/phpmyadmin
+2. Chọn database: vietlance
+3. Click tab SQL
+4. Copy và chạy file: database/seed_all.sql
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+DỮ LIỆU SẼ ĐƯỢC THÊM:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📌 ADMIN (3 tài khoản):
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. Super Admin
+   - Email: superadmin@vietlance.com
+   - Admin Login: superadmin
+   - Password: password
+   - Role: superadmin
+
+2. Admin
+   - Email: admin@vietlance.com
+   - Admin Login: admin
+   - Password: password
+   - Role: admin
+
+3. Viewer
+   - Email: viewer@vietlance.com
+   - Admin Login: viewer
+   - Password: password
+   - Role: viewer
+
+📌 FREELANCE (2 tài khoản):
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. Nguyễn Văn A
+   - Email: freelance1@vietlance.com
+   - Password: password
+   - Skills: PHP, Laravel, JavaScript, Vue.js, MySQL
+   - Hourly Rate: $25
+
+2. Trần Thị B
+   - Email: freelance2@vietlance.com
+   - Password: password
+   - Skills: Figma, Adobe XD, Photoshop, Illustrator
+   - Hourly Rate: $20
+
+📌 CLIENT (2 tài khoản):
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1. Công ty ABC
+   - Email: client1@vietlance.com
+   - Password: password
+   - Company: Công ty TNHH ABC
+
+2. Công ty XYZ
+   - Email: client2@vietlance.com
+   - Password: password
+   - Company: Công ty Cổ phần XYZ
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+⚠️ LƯU Ý:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+- Tất cả password mặc định: password
+- Password đã được hash bằng bcrypt
+- Nên đổi password sau khi đăng nhập lần đầu
+
