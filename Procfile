@@ -1,2 +1,2 @@
-web: /usr/local/bin/start-server.sh
+web: php -S 0.0.0.0:$PORT -t public
 

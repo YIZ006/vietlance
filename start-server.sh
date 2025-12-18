@@ -20,12 +20,11 @@ if ! echo "$PORT_NUM" | grep -qE '^[0-9]+$'; then
     PORT_NUM=80
 fi
 
-echo "Starting Laravel server on port $PORT_NUM (converted from PORT=$PORT)"
+echo "Starting PHP built-in server on port $PORT_NUM (converted from PORT=$PORT)"
 
-# Export PORT as integer for Laravel (this ensures it's treated as integer)
+# Export PORT as integer
 export PORT=$PORT_NUM
 
-# Run Laravel artisan serve with proper port handling
-# Use --port with the numeric value explicitly
-exec php artisan serve --host=0.0.0.0 --port=$PORT_NUM
+# Run PHP built-in server (simpler and avoids Laravel ServeCommand issues)
+exec php -S 0.0.0.0:$PORT_NUM -t public
 
