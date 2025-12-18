@@ -14,6 +14,9 @@ fi
 
 echo "Starting Laravel server on port $PORT_NUM"
 
+# Export PORT as integer for Laravel
+export PORT=$PORT_NUM
+
 # Run Laravel artisan serve with proper port handling
 exec php artisan serve --host=0.0.0.0 --port=$PORT_NUM
 
