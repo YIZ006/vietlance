@@ -120,6 +120,6 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
 # Use entrypoint script
 ENTRYPOINT ["docker-entrypoint.sh"]
 
-# Start supervisor
-CMD ["/usr/bin/supervisord", "-c", "/etc/supervisor/conf.d/supervisord.conf"]
+# Default command (can be overridden by Railway startCommand)
+CMD ["/usr/local/bin/start-server.sh"]
 
