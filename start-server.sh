@@ -25,6 +25,7 @@ echo "Starting PHP built-in server on port $PORT_NUM (converted from PORT=$PORT)
 # Export PORT as integer
 export PORT=$PORT_NUM
 
-# Run PHP built-in server (simpler and avoids Laravel ServeCommand issues)
-exec php -S 0.0.0.0:$PORT_NUM -t public
+# Run PHP built-in server with Laravel router script
+# public/index.php is the router script that handles all requests
+exec php -S 0.0.0.0:$PORT_NUM -t public public/index.php
 
