@@ -32,9 +32,9 @@ COPY composer.json composer.lock* ./
 RUN composer install \
     --no-dev \
     --no-scripts \
-    --no-autoloader \
     --prefer-dist \
-    --optimize-autoloader
+    --optimize-autoloader \
+    --no-interaction
 
 # Stage 3: Production Image
 FROM php:8.2-fpm-alpine AS production
@@ -70,14 +70,23 @@ COPY --from=composer:2.7 /usr/bin/composer /usr/bin/composer
 # Set working directory
 WORKDIR /var/www/html
 
+# Copy composer files first
+COPY composer.json composer.lock* ./
+
+# Install PHP dependencies directly in production stage
+RUN composer install \
+    --no-dev \
+    --no-scripts \
+    --prefer-dist \
+    --optimize-autoloader \
+    --no-interaction \
+    || echo "Warning: Composer install failed, will retry in entrypoint"
+
 # Copy application files
 COPY . .
 
 # Copy built assets from build stage
 COPY --from=build-assets /app/public/build ./public/build
-
-# Copy PHP dependencies from composer stage
-COPY --from=composer-deps /app/vendor ./vendor
 
 # Set permissions
 RUN chown -R www-data:www-data /var/www/html \

@@ -25,6 +25,15 @@ else
     echo "Nginx config updated with PORT=$PORT"
 fi
 
+# Check if vendor directory exists
+if [ ! -d "/var/www/html/vendor" ]; then
+    echo "ERROR: vendor directory not found! Installing dependencies..."
+    composer install --no-dev --optimize-autoloader --no-interaction || {
+        echo "Failed to install composer dependencies"
+        exit 1
+    }
+fi
+
 # Wait for MySQL to be ready
 echo "Waiting for MySQL..."
 until php -r "try { new PDO('mysql:host=${DB_HOST:-mysql};port=${DB_PORT:-3306}', '${DB_USERNAME:-root}', '${DB_PASSWORD:-password}'); echo 'MySQL is ready\n'; exit(0); } catch (Exception \$e) { exit(1); }" 2>/dev/null; do
@@ -41,13 +50,13 @@ fi
 # Generate application key if not set
 if ! grep -q "APP_KEY=base64:" .env 2>/dev/null; then
     echo "Generating application key..."
-    php artisan key:generate --force || true
+    php artisan key:generate --force 2>/dev/null || echo "Warning: Could not generate APP_KEY"
 fi
 
 # Create storage link
 if [ ! -L public/storage ]; then
     echo "Creating storage symlink..."
-    php artisan storage:link || true
+    php artisan storage:link 2>/dev/null || echo "Warning: Could not create storage link"
 fi
 
 # Set permissions
@@ -57,10 +66,10 @@ chmod -R 775 /var/www/html/storage /var/www/html/bootstrap/cache
 
 # Clear and cache config
 echo "Optimizing Laravel..."
-php artisan config:clear || true
-php artisan cache:clear || true
-php artisan view:clear || true
-php artisan route:clear || true
+php artisan config:clear 2>/dev/null || true
+php artisan cache:clear 2>/dev/null || true
+php artisan view:clear 2>/dev/null || true
+php artisan route:clear 2>/dev/null || true
 
 # Run migrations (optional - comment out if you want to run manually)
 # echo "Running migrations..."
@@ -69,9 +78,9 @@ php artisan route:clear || true
 # Cache config for production
 if [ "${APP_ENV:-production}" = "production" ]; then
     echo "Caching configuration for production..."
-    php artisan config:cache || true
-    php artisan route:cache || true
-    php artisan view:cache || true
+    php artisan config:cache 2>/dev/null || true
+    php artisan route:cache 2>/dev/null || true
+    php artisan view:cache 2>/dev/null || true
 fi
 
 echo "Application is ready!"
