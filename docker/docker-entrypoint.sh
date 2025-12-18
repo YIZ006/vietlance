@@ -4,8 +4,22 @@ set -e
 echo "Starting Vietlance application..."
 
 # Set PORT from Railway environment variable (default to 80)
-export PORT=${PORT:-80}
-echo "Using PORT: $PORT"
+# Convert PORT to integer to avoid Laravel ServeCommand issues
+# Railway provides PORT as string, need to ensure it's numeric
+if [ -z "$PORT" ] || [ "$PORT" = "" ]; then
+    PORT=80
+fi
+# Extract only numeric part and ensure it's a valid integer
+PORT_NUM=$(echo "$PORT" | sed 's/[^0-9]//g')
+if [ -z "$PORT_NUM" ] || [ "$PORT_NUM" = "" ]; then
+    PORT_NUM=80
+fi
+# Ensure PORT is exported as integer (remove any non-numeric characters)
+export PORT=$PORT_NUM
+export NGINX_PORT=$PORT_NUM
+# Also set for Laravel artisan serve compatibility
+export SERVER_PORT=$PORT_NUM
+echo "Using PORT: $PORT (as integer)"
 
 # Generate Nginx config with PORT variable from template
 if [ -f /etc/nginx/http.d/default.conf.template ]; then
