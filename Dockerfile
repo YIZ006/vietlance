@@ -106,6 +106,10 @@ COPY docker/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 COPY docker/docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 
+# Copy start-server script (for Railway if needed)
+COPY start-server.sh /usr/local/bin/start-server.sh
+RUN chmod +x /usr/local/bin/start-server.sh
+
 # Expose port
 EXPOSE 80
 
