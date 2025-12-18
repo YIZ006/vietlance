@@ -9,7 +9,8 @@ WORKDIR /app
 COPY package.json package-lock.json* ./
 
 # Install dependencies
-RUN npm ci
+# Use npm ci if package-lock.json exists, otherwise fallback to npm install
+RUN if [ -f package-lock.json ]; then npm ci; else npm install; fi
 
 # Copy source files for building
 COPY vite.config.js ./
