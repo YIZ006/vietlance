@@ -20,12 +20,15 @@ if ! echo "$PORT_NUM" | grep -qE '^[0-9]+$'; then
     PORT_NUM=80
 fi
 
-echo "Starting PHP built-in server on port $PORT_NUM (converted from PORT=$PORT)"
+# Use HOST from env if set, otherwise use 0.0.0.0
+HOST="${HOST:-0.0.0.0}"
+
+echo "Starting PHP built-in server on $HOST:$PORT_NUM (converted from PORT=$PORT)"
 
 # Export PORT as integer
 export PORT=$PORT_NUM
 
 # Run PHP built-in server with Laravel router script
 # public/index.php is the router script that handles all requests
-exec php -S 0.0.0.0:$PORT_NUM -t public public/index.php
+exec php -S $HOST:$PORT_NUM -t public public/index.php
 

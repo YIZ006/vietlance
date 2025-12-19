@@ -22,11 +22,13 @@ APP_ENV=production
 APP_KEY=base64:YOUR_APP_KEY_HERE
 APP_DEBUG=false
 APP_URL=https://your-app-name.up.railway.app
+HOST=0.0.0.0
 ```
 
 **Lưu ý:**
 - `APP_KEY`: Chạy `php artisan key:generate` trên local để lấy key, hoặc Railway sẽ tự generate
 - `APP_URL`: Thay `your-app-name` bằng domain Railway của bạn
+- `HOST`: Host để bind PHP server (mặc định: `0.0.0.0`). Nếu gặp lỗi với `0.0.0.0`, thử `127.0.0.1` hoặc để trống
 
 ### 2. Database Configuration
 
