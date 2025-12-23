@@ -3,7 +3,7 @@ set -e
 
 echo "Starting Vietlance application..."
 
-# Set PORT from Railway environment variable (default to 80)
+# Railway tự động quản lý PORT - script này chỉ đọc PORT từ environment variable
 # Convert PORT to integer to avoid Laravel ServeCommand issues
 # Railway provides PORT as string, need to ensure it's numeric
 if [ -z "$PORT" ] || [ "$PORT" = "" ]; then

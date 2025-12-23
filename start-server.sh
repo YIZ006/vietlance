@@ -4,23 +4,25 @@ set -e
 # Change to application directory
 cd /var/www/html || exit 1
 
-# Ensure PORT is an integer
+# Railway tự động quản lý PORT - script này chỉ đọc PORT từ environment variable
+# Ensure PORT is an integer (defaults to 80 if not set)
 if [ -z "$PORT" ]; then
-    PORT=80
+    PORT=8080
 fi
 
 # Extract only numeric part and ensure it's a valid integer
 PORT_NUM=$(echo "$PORT" | sed 's/[^0-9]//g')
 if [ -z "$PORT_NUM" ] || [ "$PORT_NUM" = "" ]; then
-    PORT_NUM=80
+    PORT_NUM=8080
 fi
-
+ 
 # Ensure PORT_NUM is not empty and is numeric
 if ! echo "$PORT_NUM" | grep -qE '^[0-9]+$'; then
-    PORT_NUM=80
+    PORT_NUM=8080 
 fi
 
-# Railway requires binding to 0.0.0.0 to accept external connections
+# Railway tự động quản lý HOST - mặc định là 0.0.0.0 để accept external connections
+# Không cần set HOST thủ công, Railway sẽ tự động quản lý
 HOST="${HOST:-0.0.0.0}"
 
 echo "Starting PHP built-in server on $HOST:$PORT_NUM (converted from PORT=$PORT)"

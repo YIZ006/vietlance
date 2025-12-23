@@ -123,10 +123,11 @@ docker push your-registry/vietlance:latest
 Đảm bảo các biến sau được set trong production:
 
 - `APP_ENV=production`
-- `APP_DEBUG=false`
+- `APP_DEBUG`: Mặc định là `false` trong production - không cần set thủ công
 - `APP_KEY`: Phải được set
 - `DB_*`: Thông tin database production
 - `SESSION_SECRET`: Secret key
+- `HOST` và `PORT`: Railway tự động quản lý - không cần set thủ công
 - `MAIL_*`: Cấu hình email
 - `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`: OAuth Google
 - `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`: OAuth GitHub
@@ -136,6 +137,11 @@ docker push your-registry/vietlance:latest
 1. Kết nối GitHub repository với Railway
 2. Set các environment variables trong Railway dashboard
 3. Railway sẽ tự động build và deploy từ Dockerfile
+
+**Lưu ý quan trọng về Railway:**
+- **HOST và PORT**: Railway tự động quản lý - không cần set thủ công. Script `start-server.sh` sẽ tự động đọc `PORT` từ Railway và bind trên `0.0.0.0`
+- **APP_DEBUG**: Mặc định là `false` trong production - không cần set thủ công
+- Script `start-server.sh` được sử dụng làm start command (đã được cấu hình trong `railway.json`)
 
 ## Troubleshooting
 

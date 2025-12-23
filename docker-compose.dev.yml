@@ -2,6 +2,9 @@ version: '3.8'
 
 # Development docker-compose với hot reload và dev tools
 # Sử dụng: docker-compose -f docker-compose.dev.yml up
+# 
+# Lưu ý: File này dùng cho local development
+# Trên Railway, HOST và PORT được tự động quản lý - không cần set thủ công
 
 services:
   app:

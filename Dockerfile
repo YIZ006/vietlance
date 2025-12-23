@@ -110,10 +110,11 @@ RUN chmod +x /usr/local/bin/docker-entrypoint.sh
 COPY start-server.sh /usr/local/bin/start-server.sh
 RUN chmod +x /usr/local/bin/start-server.sh
 
-# Expose port
+# Expose port (Railway will automatically set PORT environment variable)
 EXPOSE 80
 
-# Health check (PORT will be set at runtime)
+# Health check (PORT will be set at runtime by Railway)
+# Railway automatically manages PORT - script will read it from environment
 HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
     CMD wget --no-verbose --tries=1 --spider http://localhost:${PORT:-80}/ 2>/dev/null || exit 1
 
