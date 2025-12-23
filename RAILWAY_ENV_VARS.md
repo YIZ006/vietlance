@@ -20,15 +20,14 @@ Hướng dẫn cấu hình các biến môi trường (Environment Variables) ch
 APP_NAME=Vietlance
 APP_ENV=production
 APP_KEY=base64:YOUR_APP_KEY_HERE
-APP_DEBUG=false
 APP_URL=https://your-app-name.up.railway.app
-HOST=0.0.0.0
 ```
 
 **Lưu ý:**
 - `APP_KEY`: Chạy `php artisan key:generate` trên local để lấy key, hoặc Railway sẽ tự generate
 - `APP_URL`: Thay `your-app-name` bằng domain Railway của bạn
-- `HOST`: Host để bind PHP server (mặc định: `0.0.0.0`). Nếu gặp lỗi với `0.0.0.0`, thử `127.0.0.1` hoặc để trống
+- `APP_DEBUG`: Mặc định là `false` trong production, không cần set thủ công
+- `HOST` và `PORT`: Railway tự động quản lý - không cần set thủ công. Script `start-server.sh` sẽ tự động đọc `PORT` từ Railway và bind trên `0.0.0.0`
 
 ### 2. Database Configuration
 
@@ -128,7 +127,8 @@ GITHUB_REDIRECT_URI=https://your-app-name.up.railway.app/auth/github/callback
 
 Railway tự động cung cấp các biến sau (không cần set thủ công):
 
-- `PORT`: Port mà ứng dụng cần listen (Railway tự động set)
+- `PORT`: Port mà ứng dụng cần listen (Railway tự động set, script `start-server.sh` sẽ tự động đọc)
+- `HOST`: Mặc định là `0.0.0.0` (Railway tự động quản lý)
 - `RAILWAY_ENVIRONMENT`: Môi trường hiện tại (production, preview, etc.)
 - `RAILWAY_PROJECT_ID`: ID của project
 - `RAILWAY_SERVICE_ID`: ID của service
@@ -144,7 +144,6 @@ Copy toàn bộ nội dung sau vào **Raw Editor** của Railway Variables:
 APP_NAME=Vietlance
 APP_ENV=production
 APP_KEY=base64:YOUR_APP_KEY_HERE
-APP_DEBUG=false
 APP_URL=https://your-app-name.up.railway.app
 
 # Database
@@ -208,7 +207,7 @@ GITHUB_REDIRECT_URI=https://your-app-name.up.railway.app/auth/github/callback
 
 ### Lỗi "Invalid address: 0.0.0.0:$PORT"
 - **Nguyên nhân**: Railway tự động set biến `PORT`, nhưng ứng dụng chưa được cấu hình để sử dụng
-- **Giải pháp**: Đã được fix trong Dockerfile và entrypoint script
+- **Giải pháp**: Đã được fix trong `start-server.sh` - script tự động đọc `PORT` từ Railway và bind trên `0.0.0.0`
 
 ### Lỗi database connection
 - Kiểm tra các biến `DB_*` đã được set đúng chưa
